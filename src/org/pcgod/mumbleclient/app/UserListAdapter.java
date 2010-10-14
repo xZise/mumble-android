@@ -7,14 +7,12 @@ import java.util.HashMap;
 import java.util.List;
 import java.util.Map;
 
-import org.pcgod.mumbleclient.Globals;
 import org.pcgod.mumbleclient.R;
 import org.pcgod.mumbleclient.service.audio.AudioOutputHost;
 import org.pcgod.mumbleclient.service.model.User;
 import org.pcgod.mumbleclient.service.model.TalkingState;
 
 import android.content.Context;
-import android.util.Log;
 import android.view.LayoutInflater;
 import android.view.View;
 import android.view.ViewGroup;
@@ -273,12 +271,6 @@ public class UserListAdapter extends BaseAdapter {
 			}
 		}
 		
-		Log.i(Globals.LOG_TAG, String.format(
-			"Updated user %s: %b, %b, %d",
-			user.name,
-			user.muted,
-			user.deafened,
-			user.talkingState));
 
 		view.invalidate();
 	}
