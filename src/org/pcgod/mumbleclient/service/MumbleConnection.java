@@ -105,8 +105,7 @@ public class MumbleConnection implements Runnable {
 	private DatagramSocket udpOut;
 	private long lastUdpPing;
 
-	private Thread tcpPingThread;
-	private Thread udpPingThread;
+	private Thread pingThread;
 	private boolean disconnecting = false;
 
 	private final String host;
@@ -328,18 +327,18 @@ public class MumbleConnection implements Runnable {
 		}
 	}
 
-	public final void sendUdpTunnelMessage(final byte[] buffer, final int length)
-		throws IOException {
-		sendUdpTunnelMessage(buffer, length, false);
-	}
-
-	public final void sendUdpTunnelMessage(
+	public final void sendUdpMessage(
 		final byte[] buffer,
 		final int length,
 		final boolean forceUdp) throws IOException {
+		// FIXME: This would break things because we don't handle nonce resync messages
+//		if (!cryptState.isInitialized()) {
+//			return;
+//		}
+
 		if (forceUdp ||
 			lastUdpPing + UDP_PING_TRESHOLD > System.currentTimeMillis()) {
-			Log.i(Globals.LOG_TAG, "MumbleConnection: Sending UDP");
+//			Log.i(Globals.LOG_TAG, "MumbleConnection: Sending UDP");
 
 			final byte[] encryptedBuffer = cryptState.Encrypt(buffer, length);
 			final DatagramPacket outPacket = new DatagramPacket(
@@ -351,9 +350,9 @@ public class MumbleConnection implements Runnable {
 
 			udpOut.send(outPacket);
 		} else {
-			Log.i(
-				Globals.LOG_TAG,
-				"MumbleConnection: Tunneling UDP through TCP");
+//			Log.i(
+//				Globals.LOG_TAG,
+//				"MumbleConnection: Tunneling UDP through TCP");
 
 			final short type = (short) MessageType.UDPTunnel.ordinal();
 
@@ -389,7 +388,7 @@ public class MumbleConnection implements Runnable {
 
 		final Version.Builder v = Version.newBuilder();
 		v.setVersion(protocolVersion);
-		v.setRelease("javalib 0.0.1-dev");
+		v.setRelease("MumbleAndroid 0.0.1-dev");
 
 		final Authenticate.Builder a = Authenticate.newBuilder();
 		a.setUsername(username);
@@ -505,7 +504,7 @@ public class MumbleConnection implements Runnable {
 				// Serialize the message processing by performing it inside
 				// the stateLock.
 				synchronized (stateLock) {
-					Log.i(Globals.LOG_TAG, "MumbleConnection: Received UDP");
+//					Log.i(Globals.LOG_TAG, "MumbleConnection: Received UDP");
 					processUdpPacket(buffer, buffer.length);
 				}
 			}
@@ -596,10 +595,8 @@ public class MumbleConnection implements Runnable {
 			currentUser.isCurrent = true;
 			currentChannel = currentUser.getChannel();
 
-			tcpPingThread = new Thread(new TCPPingThread(this), "TCP Ping");
-			tcpPingThread.start();
-			udpPingThread = new Thread(new UDPPingThread(this), "UDP Ping");
-			udpPingThread.start();
+			pingThread = new Thread(new PingThread(this), "Ping");
+			pingThread.start();
 			Log.i(Globals.LOG_TAG, ">>> " + t);
 
 			ao = new AudioOutput(audioHost);
@@ -755,7 +752,7 @@ public class MumbleConnection implements Runnable {
 
 	private void processUdpPacket(final byte[] buffer, final int length) {
 		final int type = buffer[0] >> 5 & 0x7;
-		if (type == 1) {
+		if (type == UDPMESSAGETYPE_UDPPING) {
 			final long timestamp = (long) buffer[1] << 24 + (long) buffer[2] << 16 + (long) buffer[3] << 8 + (long) buffer[4];
 
 			if (lastUdpPing < timestamp) {

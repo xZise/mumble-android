@@ -531,11 +531,11 @@ public class MumbleService extends Service {
 		this.sendChannelTextMessage(message, this.getCurrentChannel());
 	}
 
-	public void sendUdpTunnelMessage(final byte[] buffer, final int length)
+	public void sendUdpMessage(final byte[] buffer, final int length)
 		throws IOException {
 		assertConnected();
 
-		mClient.sendUdpTunnelMessage(buffer, length);
+		mClient.sendUdpMessage(buffer, length, false);
 	}
 
 	public void setRecording(final boolean state) {
