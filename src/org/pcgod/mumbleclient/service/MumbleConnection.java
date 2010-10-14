@@ -253,9 +253,9 @@ public class MumbleConnection implements Runnable {
 		}
 	}
 
-	public final void sendChannelTextMessage(final String message) {
+	public final void sendChannelTextMessage(final String message, final Channel channel) {
 		final TextMessage.Builder tmb = TextMessage.newBuilder();
-		tmb.addChannelId(currentChannel.id);
+		tmb.addChannelId(channel.id);
 		tmb.setMessage(message);
 		try {
 			sendMessage(MessageType.TextMessage, tmb);
@@ -266,7 +266,7 @@ public class MumbleConnection implements Runnable {
 		final Message msg = new Message();
 		msg.timestamp = System.currentTimeMillis();
 		msg.message = message;
-		msg.channel = currentChannel;
+		msg.channel = channel;
 		msg.direction = Message.DIRECTION_SENT;
 		connectionHost.messageSent(msg);
 	}

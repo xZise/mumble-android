@@ -508,10 +508,14 @@ public class MumbleService extends Service {
 		return false;
 	}
 
-	public void sendChannelTextMessage(final String message) {
+	public void sendChannelTextMessage(final String message, Channel channel) {
 		assertConnected();
 
-		mClient.sendChannelTextMessage(message);
+		mClient.sendChannelTextMessage(message, channel);
+	}
+	
+	public void sendChannelTextMessage(final String message) {
+		this.sendChannelTextMessage(message, this.getCurrentChannel());
 	}
 
 	public void sendUdpTunnelMessage(final byte[] buffer, final int length)
