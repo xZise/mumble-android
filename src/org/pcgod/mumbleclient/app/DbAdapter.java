@@ -10,7 +10,7 @@ import android.util.Log;
 class DbAdapter {
 	private static class DatabaseHelper extends SQLiteOpenHelper {
 		public DatabaseHelper(final Context context) {
-			super(context, DATABASE_NAME, null, 2);
+			super(context, DATABASE_NAME, null, 3);
 		}
 
 		@Override
@@ -22,6 +22,13 @@ class DbAdapter {
 					   + "`port` INTEGER,"
 					   + "`username` TEXT NOT NULL,"
 					   + "`password` TEXT"
+					   + ");");
+			
+			/* Create list for access tokens */
+			db.execSQL("CREATE TABLE `accesstoken` ("
+					   + "`_id` INTEGER PRIMARY KEY AUTOINCREMENT,"
+					   + "`server_id` INTEGER NOT NULL,"
+					   + "`value` TEXT NOT NULL"
 					   + ");");
 		}
 
@@ -40,17 +47,34 @@ class DbAdapter {
 						   + "FROM `server_old`");
 				db.execSQL("DROP TABLE `server_old`");
 			}
+			
+			if (oldVersion < 2) {
+				/* Create list for access tokens */
+				db.execSQL("CREATE TABLE `accesstoken` ("
+						   + "`_id` INTEGER PRIMARY KEY AUTOINCREMENT,"
+						   + "`server_id` INTEGER NOT NULL,"
+						   + "`value` TEXT NOT NULL"
+						   + ");");
+			}
 		}
 	}
+	
+	public static final String COL_ID = "_id";
 
 	public static final String DATABASE_NAME = "mumble.db";
 	public static final String SERVER_TABLE = "server";
-	public static final String SERVER_COL_ID = "_id";
+	public static final String SERVER_COL_ID = COL_ID;
 	public static final String SERVER_COL_NAME = "name";
 	public static final String SERVER_COL_HOST = "host";
 	public static final String SERVER_COL_PORT = "port";
 	public static final String SERVER_COL_USERNAME = "username";
 	public static final String SERVER_COL_PASSWORD = "password";
+	
+	public static final String ACCESS_TOKEN_TABLE = "accesstoken";
+	public static final String ACCESS_TOKEN_COL_ID = COL_ID;
+	public static final String ACCESS_TOKEN_COL_SERVER_ID = "server_id";
+	public static final String ACCESS_TOKEN_COL_VALUE = "value";
+	
 
 	private final Context context;
 	private SQLiteDatabase db;
@@ -64,6 +88,90 @@ class DbAdapter {
 		dbHelper.close();
 	}
 
+	public final DbAdapter open() {
+		dbHelper = new DatabaseHelper(context);
+		db = dbHelper.getWritableDatabase();
+		return this;
+	}
+	
+	/* Access Token stuff */	
+	public final AccessToken createAccessToken(final long serverId, final String value) {
+		final ContentValues values = new ContentValues();
+		values.put(ACCESS_TOKEN_COL_SERVER_ID, serverId);
+		values.put(ACCESS_TOKEN_COL_VALUE, value);
+		return new AccessToken(value, db.insert(ACCESS_TOKEN_TABLE, null, values), serverId);		
+	}
+
+	public final boolean deleteAccessToken(final long accessTokenId) {
+		return db.delete(ACCESS_TOKEN_TABLE, ACCESS_TOKEN_COL_ID + " = " + accessTokenId, null) > 0;
+	}
+	
+	//TODO: What if it doesn't delete all lines?
+	public final boolean deleteAccessTokenByServerId(final long serverId) {
+		return db.delete(ACCESS_TOKEN_TABLE, ACCESS_TOKEN_COL_SERVER_ID + " = " + serverId, null) > 0;
+	}
+	
+	public final void updateAccessToken(final long accessTokenId, final long serverId, final long value) {
+		final ContentValues values = new ContentValues();
+		values.put(ACCESS_TOKEN_COL_SERVER_ID, serverId);
+		values.put(ACCESS_TOKEN_COL_VALUE, value);
+		db.update(ACCESS_TOKEN_TABLE, values, ACCESS_TOKEN_COL_ID + "=?", new String[] { Long.toString(accessTokenId) });		
+	}
+	
+	public final AccessToken[] fetchAllAccessToken() {		
+		final Cursor c = db.query(
+				ACCESS_TOKEN_TABLE,
+				new String[] { ACCESS_TOKEN_COL_ID, ACCESS_TOKEN_COL_SERVER_ID, ACCESS_TOKEN_COL_VALUE },
+				null,
+				null,
+				null,
+				null,
+				null);
+
+		if (c.moveToFirst()) {
+			AccessToken[] result = new AccessToken[c.getCount()];
+			for (int i = 0; i < result.length; i++) {
+				String value = c.getString(c.getColumnIndexOrThrow(ACCESS_TOKEN_COL_VALUE));
+				long id = c.getLong(c.getColumnIndexOrThrow(ACCESS_TOKEN_COL_ID));
+				long serverId = c.getLong(c.getColumnIndexOrThrow(ACCESS_TOKEN_COL_SERVER_ID));
+				
+				result[i] = new AccessToken(value, id, serverId);
+				c.moveToNext();
+			}
+			c.close();
+			return result;
+		} else {
+			return new AccessToken[0];
+		}
+	}
+	
+	public final AccessToken[] fetchAccessTokenByServerId(final long serverId) {
+		final Cursor c = db.query(
+				ACCESS_TOKEN_TABLE,
+				new String[] { ACCESS_TOKEN_COL_ID, ACCESS_TOKEN_COL_VALUE },
+				ACCESS_TOKEN_COL_SERVER_ID + "=?",
+				new String[] { Long.toString(serverId) },
+				null,
+				null,
+				null);
+
+		if (c.moveToFirst()) {
+			AccessToken[] result = new AccessToken[c.getCount()];
+			for (int i = 0; i < result.length; i++) {
+				long id = c.getLong(c.getColumnIndexOrThrow(ACCESS_TOKEN_COL_ID));
+				String value = c.getString(c.getColumnIndexOrThrow(ACCESS_TOKEN_COL_VALUE));
+				
+				result[i] = new AccessToken(value, id, serverId);
+				c.moveToNext();
+			}
+			c.close();
+			return result;
+		} else {
+			return new AccessToken[0];
+		}
+	}
+	
+	/* Server stuff */
 	public final long createServer(
 		final String name,
 		final String host,
@@ -80,7 +188,7 @@ class DbAdapter {
 	}
 
 	public final boolean deleteServer(final long serverId) {
-		return db.delete(SERVER_TABLE, SERVER_COL_ID + " = " + serverId, null) > 0;
+		return db.delete(SERVER_TABLE, SERVER_COL_ID + " = " + serverId, null) > 0 && this.deleteAccessTokenByServerId(serverId);
 	}
 
 	public final Cursor fetchAllServers() {
@@ -112,12 +220,6 @@ class DbAdapter {
 		}
 
 		return c;
-	}
-
-	public final DbAdapter open() {
-		dbHelper = new DatabaseHelper(context);
-		db = dbHelper.getWritableDatabase();
-		return this;
 	}
 
 	public final void updateServer(

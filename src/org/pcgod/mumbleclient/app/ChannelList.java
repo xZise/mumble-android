@@ -237,6 +237,7 @@ public class ChannelList extends ConnectedActivity {
 	public static final String SAVED_STATE_VISIBLE_CHANNEL = "visible_channel";
 
 	private static final int MENU_CHAT = Menu.FIRST;
+	private static final int MENU_ACCESS_TOKENS = Menu.FIRST + 1;
 
 	private boolean isConnected = false;
 	Channel visibleChannel;
@@ -326,6 +327,8 @@ public class ChannelList extends ConnectedActivity {
 	public final boolean onCreateOptionsMenu(final Menu menu) {
 		menu.add(0, MENU_CHAT, 0, "Chat").setIcon(
 			android.R.drawable.ic_btn_speak_now);
+		menu.add(0, MENU_ACCESS_TOKENS, 0, "Access Tokens").setIcon(
+			android.R.drawable.ic_lock_lock);
 		return true;
 	}
 
@@ -336,8 +339,8 @@ public class ChannelList extends ConnectedActivity {
 			b.setIcon(android.R.drawable.ic_dialog_alert);
 			b.setTitle("Disconnect");
 			b.setMessage("Are you sure you want to disconnect from Mumble?");
-			b.setPositiveButton(android.R.string.yes, onDisconnectConfirm);
-			b.setNegativeButton(android.R.string.no, null);
+			b.setPositiveButton(R.string.yes, onDisconnectConfirm);
+			b.setNegativeButton(R.string.no, null);
 			mDisconnectDialog = b.show();
 
 			return true;
@@ -354,6 +357,11 @@ public class ChannelList extends ConnectedActivity {
 		case MENU_CHAT:
 			final Intent i = new Intent(this, ChatActivity.class);
 			startActivity(i);
+			return true;
+		case MENU_ACCESS_TOKENS :
+			final Intent tokensIntent = new Intent(this, AccessTokens.class);
+			tokensIntent.putExtra(MumbleService.EXTRA_ID, this.mService.getServerID());
+			startActivity(tokensIntent);
 			return true;
 		default:
 			return super.onMenuItemSelected(featureId, item);

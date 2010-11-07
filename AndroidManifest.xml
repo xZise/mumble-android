@@ -11,9 +11,10 @@
 		</activity>
 		<activity android:name=".app.ServerInfo" />
 		<activity android:name=".app.ChannelList" android:launchMode="singleTask" />
-		<activity android:name=".app.ChatActivity" />
-		<service android:enabled="true" android:name=".service.MumbleService" />
-	</application>
+		<activity android:name=".app.ChatActivity" ></activity><activity android:name=".app.AccessTokens"></activity>
+		<service android:enabled="true" android:name=".service.MumbleService" ></service>
+	
+</application>
 	<uses-sdk android:targetSdkVersion="8" android:minSdkVersion="3" />
 	<uses-permission android:name="android.permission.RECORD_AUDIO" />
 	<uses-permission android:name="android.permission.INTERNET" />

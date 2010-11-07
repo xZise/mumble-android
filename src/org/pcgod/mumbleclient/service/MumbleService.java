@@ -64,6 +64,7 @@ public class MumbleService extends Service {
 	public static final String EXTRA_USERNAME = "mumbleclient.extra.USERNAME";
 	public static final String EXTRA_PASSWORD = "mumbleclient.extra.PASSWORD";
 	public static final String EXTRA_USER = "mumbleclient.extra.USER";
+	public static final String EXTRA_ID = "mumbleclient.extra.ID";
 
 	private MumbleConnection mClient;
 	private Thread mClientThread;
@@ -404,7 +405,8 @@ public class MumbleService extends Service {
 		final int port = intent.getIntExtra(EXTRA_PORT, -1);
 		final String username = intent.getStringExtra(EXTRA_USERNAME);
 		final String password = intent.getStringExtra(EXTRA_PASSWORD);
-
+		final long id  = intent.getLongExtra(EXTRA_ID, -1); 
+		
 		if (mClient != null &&
 			mClient.isSameServer(host, port, username, password) &&
 			isConnected()) {
@@ -421,7 +423,8 @@ public class MumbleService extends Service {
 			host,
 			port,
 			username,
-			password);
+			password,
+			id);
 		mClientThread = new Thread(mClient, "net");
 		mClientThread.start();
 		return START_NOT_STICKY;
@@ -433,6 +436,10 @@ public class MumbleService extends Service {
 
 	public boolean isRecording() {
 		return (mRecordThread != null);
+	}
+	
+	public long getServerID() {
+		return this.mClient.getServerID();
 	}
 
 	public void joinChannel(final int channelId) {

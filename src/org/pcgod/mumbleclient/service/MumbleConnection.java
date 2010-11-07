@@ -112,6 +112,8 @@ public class MumbleConnection implements Runnable {
 	private final int port;
 	private final String username;
 	private final String password;
+	//TODO: Find better place, if there is a better place?
+	private final long id; /* Server ID */
 
 	private AudioOutput ao;
 	private Thread audioOutputThread;
@@ -145,18 +147,20 @@ public class MumbleConnection implements Runnable {
 	 *            Server password
 	 */
 	public MumbleConnection(
-		final MumbleConnectionHost connectionHost_,
-		final AudioOutputHost audioHost_,
-		final String host_,
-		final int port_,
-		final String username_,
-		final String password_) {
-		connectionHost = connectionHost_;
-		audioHost = audioHost_;
-		host = host_;
-		port = port_;
-		username = username_;
-		password = password_;
+		final MumbleConnectionHost connectionHost,
+		final AudioOutputHost audioHost,
+		final String host,
+		final int port,
+		final String username,
+		final String password,
+		final long id) {
+		this.connectionHost = connectionHost;
+		this.audioHost = audioHost;
+		this.host = host;
+		this.port = port;
+		this.username = username;
+		this.password = password;
+		this.id = id;
 
 		connectionHost.setConnectionState(ConnectionState.Connecting);
 	}
@@ -180,6 +184,10 @@ public class MumbleConnection implements Runnable {
 		final String error = errorString;
 		errorString = null;
 		return error;
+	}
+	
+	public long getServerID() {
+		return this.id;
 	}
 
 	public final boolean isConnectionAlive() {
