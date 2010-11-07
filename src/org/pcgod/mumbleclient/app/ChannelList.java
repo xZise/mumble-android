@@ -412,7 +412,7 @@ public class ChannelList extends ConnectedActivity {
 	 * Handles activity initialization when the Service is connecting.
 	 */
 	private void onConnecting() {
-		showProgressDialog(R.string.connectionProgressSynchronizingMessage);
+		showProgressDialog(R.string.connectionProgressConnectingMessage);
 		synchronizeControls();
 	}
 
