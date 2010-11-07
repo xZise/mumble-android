@@ -3,6 +3,7 @@ package org.pcgod.mumbleclient.service;
 import java.io.DataInputStream;
 import java.io.DataOutputStream;
 import java.io.IOException;
+import java.net.ConnectException;
 import java.net.DatagramPacket;
 import java.net.DatagramSocket;
 import java.net.Inet4Address;
@@ -255,6 +256,8 @@ public class MumbleConnection implements Runnable {
 			udpSocket = new DatagramSocket();
 			udpSocket.connect(Inet4Address.getByName(host), port);
 
+			Log.i(Globals.LOG_TAG, "Syncing");
+
 			synchronized (stateLock) {
 				connectionHost.setConnectionState(ConnectionState.Synchronizing);
 			}
@@ -286,8 +289,10 @@ public class MumbleConnection implements Runnable {
 			e.printStackTrace();
 		} catch (final UnknownHostException e) {
 			errorString = String.format("Host \"%s\" unknown", host);
+		} catch (final ConnectException e) {
+			errorString = "The host refused connection";
 		} catch (final IOException e) {
-			e.printStackTrace();
+			Log.e(Globals.LOG_TAG, "Error connecting", e);
 		} catch (final InterruptedException e) {
 			e.printStackTrace();
 		}
