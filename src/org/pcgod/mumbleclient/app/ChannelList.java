@@ -415,6 +415,20 @@ public class ChannelList extends ConnectedActivity {
 			mProgressDialog.dismiss();
 			mProgressDialog = null;
 		}
+		
+		// Tell the access tokens to the server
+		DbAdapter db = new DbAdapter(this);
+		db.open();
+		try {
+			AccessToken[] tokens = db.fetchAccessTokenByServerId(this.mService.getServerID());
+			String[] strTokens = new String[tokens.length];
+			for (int i = 0; i < strTokens.length; i++) {
+				strTokens[i] = tokens[i].value;
+			}
+			this.mService.authenticate(strTokens);
+		} finally {
+			db.close();
+		}
 
 		// If we don't have visible channel selected, default to the current channel.
 		// Setting channel also synchronizes the UI so we don't need to do it manually.
