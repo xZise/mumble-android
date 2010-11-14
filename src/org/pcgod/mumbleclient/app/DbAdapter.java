@@ -111,7 +111,7 @@ class DbAdapter {
 		return db.delete(ACCESS_TOKEN_TABLE, ACCESS_TOKEN_COL_SERVER_ID + " = " + serverId, null) > 0;
 	}
 	
-	public final void updateAccessToken(final long accessTokenId, final long serverId, final long value) {
+	public final void updateAccessToken(final long accessTokenId, final long serverId, final String value) {
 		final ContentValues values = new ContentValues();
 		values.put(ACCESS_TOKEN_COL_SERVER_ID, serverId);
 		values.put(ACCESS_TOKEN_COL_VALUE, value);

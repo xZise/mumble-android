@@ -15,9 +15,12 @@
 	<string name="serverName">Name</string>
 	<string name="sendText">Send</string>
 	<string name="accessTokenDelete">Delete token</string>
-    <string name="accessTokenName">Access Token name</string>
-    <string name="accessAddToken">Add</string>
+    <string name="accessTokenEdit">Edit token</string>
+    <string name="accessAddToken">Add access token</string>
+    <string name="accessAccessToken">Access token</string>
     <string name="accessNothingToAdd">Nothing to add</string>
+    <string name="accessNothingToChange">Nothing to change</string>
+    <string name="accessNoChanges">There are no changes</string>
 	<string name="app_name">Mumble</string>
 	<string name="server_deleted">Server deleted</string>
 	<string name="chat_message">Chat message</string>

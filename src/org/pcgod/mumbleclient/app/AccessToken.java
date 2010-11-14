@@ -1,7 +1,7 @@
 package org.pcgod.mumbleclient.app;
 
 public class AccessToken {
-	public final String value;
+	public String value;
 	public final long id;
 	public final long serverId;
 	
