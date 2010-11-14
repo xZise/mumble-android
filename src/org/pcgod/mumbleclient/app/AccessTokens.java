@@ -1,7 +1,6 @@
 package org.pcgod.mumbleclient.app;
 
 import org.pcgod.mumbleclient.R;
-import org.pcgod.mumbleclient.service.MumbleService;
 import org.pcgod.mumbleclient.app.DbAdapter;
 
 import android.os.Bundle;
@@ -55,6 +54,23 @@ public class AccessTokens extends ConnectedActivity {
 		this.adapter.add(this.dbAdapter.createAccessToken(this.serverID, this.tokenName.getText().toString()));
 	}
 	
+	@Override
+	public boolean onKeyDown(final int keyCode, final KeyEvent event) {
+		if (keyCode == KeyEvent.KEYCODE_BACK && event.getRepeatCount() == 0) {
+			// If there are changes tell server the tokens
+			
+			// at the moment there are always changes *hust*
+			String[] tokens = new String[this.adapter.getCount()];
+			for (int i = 0; i < tokens.length; i++) {
+				tokens[i] = this.adapter.getItem(i).value;
+			}
+			this.mService.authenticate(tokens);
+
+		}
+
+		return super.onKeyDown(keyCode, event);
+	}
+	
     /** Called when the activity is first created. */
     @Override
     public void onCreate(Bundle savedInstanceState) {
@@ -70,7 +86,7 @@ public class AccessTokens extends ConnectedActivity {
 
 		this.registerForContextMenu(tokens);
 		
-		this.serverID = this.getIntent().getLongExtra(MumbleService.EXTRA_ID, -2);
+		this.serverID = this.mService.getServerID();
 		/* Access Tokens of an existing server or global access tokens */
 		if (this.serverID >= -1) {
 			try {

@@ -447,6 +447,12 @@ public class MumbleService extends Service {
 
 		mClient.joinChannel(channelId);
 	}
+	
+	public final void authenticate(final String[] tokens) {
+		assertConnected();
+		
+		mClient.authenticate(tokens);
+	}
 
 	@Override
 	public IBinder onBind(final Intent intent) {

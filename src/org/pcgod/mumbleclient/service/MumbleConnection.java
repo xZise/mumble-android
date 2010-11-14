@@ -203,13 +203,25 @@ public class MumbleConnection implements Runnable {
 			   username.equals(username_) && password.equals(password_);
 	}
 
-	public final void joinChannel(final int channelId) {
+	public final void joinChannel(final int channelId) {		
 		final UserState.Builder us = UserState.newBuilder();
 		us.setSession(currentUser.session);
 		us.setChannelId(channelId);
 		try {
 			sendMessage(MessageType.UserState, us);
 		} catch (final IOException e) {
+			e.printStackTrace();
+		}
+	}
+	
+	public final void authenticate(final String[] tokens) {
+		final Authenticate.Builder auth = Authenticate.newBuilder();
+		for (String string : tokens) {
+			auth.addTokens(string);
+		}
+		try {
+			this.sendMessage(MessageType.Authenticate, auth);
+		} catch (IOException e) {
 			e.printStackTrace();
 		}
 	}

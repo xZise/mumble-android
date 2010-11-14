@@ -360,7 +360,6 @@ public class ChannelList extends ConnectedActivity {
 			return true;
 		case MENU_ACCESS_TOKENS :
 			final Intent tokensIntent = new Intent(this, AccessTokens.class);
-			tokensIntent.putExtra(MumbleService.EXTRA_ID, this.mService.getServerID());
 			startActivity(tokensIntent);
 			return true;
 		default:
