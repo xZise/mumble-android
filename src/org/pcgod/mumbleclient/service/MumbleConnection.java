@@ -37,6 +37,7 @@ import org.pcgod.mumbleclient.service.audio.AudioOutput;
 import org.pcgod.mumbleclient.service.audio.AudioOutputHost;
 import org.pcgod.mumbleclient.service.model.Channel;
 import org.pcgod.mumbleclient.service.model.Message;
+import org.pcgod.mumbleclient.service.model.TalkingState;
 import org.pcgod.mumbleclient.service.model.User;
 
 import android.util.Log;
@@ -577,6 +578,18 @@ public class MumbleConnection implements Runnable {
 				added = true;
 			}
 
+			// Test if user has self muted
+			if (us.hasSelfDeaf() || us.hasSelfMute()) {
+				if (us.getSelfDeaf()) {
+					user.selfState = TalkingState.DEAFENED;
+				} else if (us.getSelfMute()) {
+					user.selfState = TalkingState.MUTED;
+				} else {
+					user.selfState = TalkingState.PASSIVE;
+				}
+			}
+			
+			// Supervisory states!
 			if (us.hasMute()) {
 				user.muted = us.getMute();
 			}

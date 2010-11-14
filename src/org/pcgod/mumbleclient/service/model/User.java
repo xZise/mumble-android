@@ -20,8 +20,14 @@ public class User implements Serializable {
 
 	public boolean muted;
 	public boolean deafened;
+	
+	public TalkingState selfState;
 
 	private Channel channel;
+	
+	public User() {
+		this.selfState = TalkingState.PASSIVE;
+	}
 
 	@Override
 	public final boolean equals(final Object o) {
