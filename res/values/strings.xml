@@ -17,6 +17,7 @@
 	<string name="accessTokenDelete">Delete token</string>
     <string name="accessTokenName">Access Token name</string>
     <string name="accessAddToken">Add</string>
+    <string name="accessNothingToAdd">Nothing to add</string>
 	<string name="app_name">Mumble</string>
 	<string name="server_deleted">Server deleted</string>
 	<string name="chat_message">Chat message</string>

@@ -360,7 +360,6 @@ public class ChannelList extends ConnectedActivity {
 			return true;
 		case MENU_ACCESS_TOKENS :
 			final Intent tokensIntent = new Intent(this, AccessTokens.class);
-			tokensIntent.putExtra(MumbleService.EXTRA_ID, this.mService.getServerID());
 			startActivity(tokensIntent);
 			return true;
 		default:
@@ -415,6 +414,20 @@ public class ChannelList extends ConnectedActivity {
 		if (mProgressDialog != null) {
 			mProgressDialog.dismiss();
 			mProgressDialog = null;
+		}
+		
+		// Tell the access tokens to the server
+		DbAdapter db = new DbAdapter(this);
+		db.open();
+		try {
+			AccessToken[] tokens = db.fetchAccessTokenByServerId(this.mService.getServerID());
+			String[] strTokens = new String[tokens.length];
+			for (int i = 0; i < strTokens.length; i++) {
+				strTokens[i] = tokens[i].value;
+			}
+			this.mService.authenticate(strTokens);
+		} finally {
+			db.close();
 		}
 
 		// If we don't have visible channel selected, default to the current channel.
