@@ -11,6 +11,7 @@ import org.pcgod.mumbleclient.Globals;
 import org.pcgod.mumbleclient.R;
 import org.pcgod.mumbleclient.service.audio.AudioOutputHost;
 import org.pcgod.mumbleclient.service.model.User;
+import org.pcgod.mumbleclient.service.model.TalkingState;
 
 import android.content.Context;
 import android.util.Log;
@@ -18,7 +19,7 @@ import android.view.LayoutInflater;
 import android.view.View;
 import android.view.ViewGroup;
 import android.widget.BaseAdapter;
-import android.widget.CheckBox;
+import android.widget.ImageView;
 import android.widget.ListView;
 import android.widget.TextView;
 
@@ -243,19 +244,35 @@ public class UserListAdapter extends BaseAdapter {
 		}
 
 		final TextView name = (TextView) view.findViewById(R.id.userRowName);
-		final TextView status = (TextView) view.findViewById(R.id.userRowStatus);
-		final CheckBox state = (CheckBox) view.findViewById(R.id.userRowTalkState);
+		final ImageView state = (ImageView) view.findViewById(R.id.userRowState);
 
 		name.setText(user.name);
-
-		if (!user.muted && !user.deafened) {
-			status.setText("");
+		
+		// supervisory deafened/muted
+		if (user.deafened) {
+			state.setImageResource(R.drawable.deafened_server);
+		} else if (user.muted) {
+			state.setImageResource(R.drawable.muted_server);	
 		} else {
-			status.setText((user.muted && user.deafened) ? "M+D"
-				: user.muted ? "M" : "D");
+			switch (user.selfState) {
+			case DEAFENED :
+				state.setImageResource(R.drawable.deafened);
+				break;
+			case MUTED :
+				state.setImageResource(R.drawable.muted);
+				break;
+			default : 
+				if (user.talkingState == AudioOutputHost.STATE_TALKING) {
+					// red lips xD
+					state.setImageResource(R.drawable.talking_on);
+				} else {
+					// grey lips
+					state.setImageResource(R.drawable.talking_off);
+				}
+				break; /* prevent fall through */
+			}
 		}
-
-		state.setChecked(user.talkingState == AudioOutputHost.STATE_TALKING);
+		
 		Log.i(Globals.LOG_TAG, String.format(
 			"Updated user %s: %b, %b, %d",
 			user.name,
@@ -299,7 +316,6 @@ public class UserListAdapter extends BaseAdapter {
 		if (visibleUsersChangedCallback != null) {
 			visibleUsersChangedCallback.run();
 		}
-
 		super.notifyDataSetChanged();
 	}
 
