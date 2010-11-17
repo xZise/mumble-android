@@ -414,7 +414,8 @@ public class MumbleService extends Service {
 			port,
 			username,
 			password,
-			this.getApplicationContext());
+			this.getApplicationContext(),
+			id);
 
 		mClientThread = new Thread(mClient, "net");
 		mClientThread.start();

@@ -156,20 +156,22 @@ public class MumbleConnection implements Runnable {
 	 *            MumbleConnection doesn't need to know what it has to pass on.
 	 */
 	public MumbleConnection(
-		final MumbleConnectionHost connectionHost_,
-		final AudioOutputHost audioHost_,
-		final String host_,
-		final int port_,
-		final String username_,
-		final String password_,
-		final Context ctx_) {
-		connectionHost = connectionHost_;
-		audioHost = audioHost_;
-		host = host_;
-		port = port_;
-		username = username_;
-		password = password_;
-		ctx = ctx_;
+		final MumbleConnectionHost connectionHost,
+		final AudioOutputHost audioHost,
+		final String host,
+		final int port,
+		final String username,
+		final String password,
+		final Context ctx,
+		final long id) {
+		this.connectionHost = connectionHost;
+		this.audioHost = audioHost;
+		this.host = host;
+		this.port = port;
+		this.username = username;
+		this.password = password;
+		this.ctx = ctx;
+		this.id = id;
 
 		connectionHost.setConnectionState(ConnectionState.Connecting);
 	}
@@ -240,7 +242,6 @@ public class MumbleConnection implements Runnable {
 		try {
 			SSLSocket tcpSocket;
 			DatagramSocket udpSocket;
-<<<<<<< HEAD
 
 			Log.i(Globals.LOG_TAG, String.format("Connecting to host \"%s\", port %s", host, port));
 			final SSLContext ctx_ = SSLContext.getInstance("TLS");
@@ -442,49 +443,6 @@ public class MumbleConnection implements Runnable {
 				final int length = in.readInt();
 				if (msg == null || msg.length != length) {
 					msg = new byte[length];
-<<<<<<< HEAD
-				}
-				in.readFully(msg);
-
-				// Serialize the message processing by performing it inside
-				// the stateLock.
-				synchronized (stateLock) {
-					processMsg(MT_CONSTANTS[type], msg);
-				}
-			}
-		};
-
-		final MumbleSocketReader udpReader = new MumbleSocketReader(stateLock) {
-			private final DatagramPacket packet = new DatagramPacket(
-				new byte[UDP_BUFFER_SIZE],
-				UDP_BUFFER_SIZE);
-
-			@Override
-			public boolean isRunning() {
-				return udpSocket.isConnected() && !disconnecting &&
-					   super.isRunning();
-			}
-
-			@Override
-			protected void process() throws IOException {
-				udpSocket.receive(packet);
-
-				final byte[] buffer = cryptState.decrypt(
-					packet.getData(),
-					packet.getLength());
-
-				// Decrypt might return null if the buffer was total garbage.
-				if (buffer == null) {
-					return;
-				}
-
-				// Serialize the message processing by performing it inside
-				// the stateLock.
-				synchronized (stateLock) {
-					Log.i(Globals.LOG_TAG, "MumbleConnection: Received UDP");
-					processUdpPacket(buffer, buffer.length);
-=======
->>>>>>> aef738f... Implemented UDP channel - MumbleConnection has now an open UDP socket in addition to the TCP one. - New UDPPingThread in addition to the old PingThread (renamed to TCPPingThread). - CryptoState in use, fixed some signed byte issues.
 				}
 				in.readFully(msg);
 
@@ -505,16 +463,12 @@ public class MumbleConnection implements Runnable {
 			public boolean isRunning() {
 				return udpSocket.isConnected() && !disconnecting;
 			}
-<<<<<<< HEAD
-		};
-
-=======
-
+			
 			@Override
 			protected void process() throws IOException {
 				udpSocket.receive(packet);
 
-				final byte[] buffer = cryptState.Decrypt(
+				final byte[] buffer = cryptState.decrypt(
 					packet.getData(),
 					packet.getLength());
 
