@@ -1,3 +1,9 @@
+Some source code is licensed by:
+Copyright (C) 2010, Fabian Neundorf
+Copyright (C) 2010, Mikko Rantanen
+
+This project includes resources from Mumble client which are used under the following license:
+
 Copyright (C) 2005-2010, Thorvald Natvig <thorvald@natvig.com>
 Copyright (C) 2007, Stefan Gehn <mETz AT gehn DOT net>
 Copyright (C) 2007, Sebastian Schlingmann <mit_service@users.sourceforge.net>
@@ -7,7 +13,6 @@ Copyright (C) 2007, Trenton Schulz
 Copyright (C) 2008-2010, Stefan Hacker <dd0t@users.sourceforge.net>
 Copyright (C) 2008-2010, Snares <snares@users.sourceforge.net>
 Copyright (C) 2009-2010, Benjamin Jemlich <pcgod@users.sourceforge.net>
-Copyright (C) 2010, Fabian Neundorf
 
 All rights reserved.
 

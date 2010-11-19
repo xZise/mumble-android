@@ -10,7 +10,6 @@ import java.util.Map;
 import org.pcgod.mumbleclient.R;
 import org.pcgod.mumbleclient.service.audio.AudioOutputHost;
 import org.pcgod.mumbleclient.service.model.User;
-import org.pcgod.mumbleclient.service.model.TalkingState;
 
 import android.content.Context;
 import android.view.LayoutInflater;
